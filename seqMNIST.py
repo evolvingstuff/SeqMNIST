@@ -12,14 +12,23 @@ import pytorch_lightning as pl
 
 class SeqMNIST(pl.LightningModule):
 
-    def __init__(self, model, learning_rate, default_batch_size):
+    def __init__(self, model, learning_rate, default_batch_size, is_permuted):
         super(SeqMNIST, self).__init__()
+        self.mnist_dim = 28 * 28
         self.model = model
         self.learning_rate = learning_rate
         self.default_batch_size = default_batch_size
+        self.fixed_permutation = None
+        if is_permuted:
+            print('Running permuted version')
+            self.fixed_permutation = torch.randperm(self.mnist_dim)
 
     def forward(self, x):
-        return self.model(x)
+        if self.fixed_permutation is not None:
+            permuted_x = x.view(-1, self.mnist_dim)[:, self.fixed_permutation]
+            return self.model(permuted_x)
+        else:
+            return self.model(x)
 
     def training_step(self, batch, batch_nb):
         x, y = batch

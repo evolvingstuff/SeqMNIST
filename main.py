@@ -8,21 +8,24 @@ tqdm.monitor_interval = 0
 
 def main():
 
-    input_dim = 28  # row-by-row sequential MNIST
-    assert 784 % input_dim == 0
+    # input_scan_dim=28 is row-by-row sequential MNIST
+    # input_scan_dim=1 to make it pixel-by-pixel
+    input_scan_dim = 28
     hidden_dim = 128
     output_dim = 10
     learning_rate = 0.0005
-    batch_size = 32
+    batch_size = 2 #
     gradient_clip = 2.0
+    is_permuted = False
 
-    model = LstmModel(input_dim, hidden_dim, output_dim)
-    lightning_module = SeqMNIST(model, learning_rate, batch_size)
-    exp = Experiment(save_dir='experiments')
+    gpus = None
     if torch.cuda.is_available():
-        trainer = Trainer(experiment=exp, gradient_clip=gradient_clip, gpus=[0])
-    else:
-        trainer = Trainer(experiment=exp, gradient_clip=gradient_clip)
+        gpus = [0]
+
+    model = LstmModel(input_scan_dim, hidden_dim, output_dim)
+    lightning_module = SeqMNIST(model, learning_rate, batch_size, is_permuted)
+    exp = Experiment(save_dir='experiments')
+    trainer = Trainer(experiment=exp, gradient_clip=gradient_clip, gpus=gpus)
     trainer.fit(lightning_module)
 
 
