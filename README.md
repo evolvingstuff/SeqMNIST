@@ -1,4 +1,4 @@
-This is a quick implementation of row-by-row sequential MNIST, using [PyTorch Lightning](https://github.com/williamFalcon/pytorch-lightning).
+This is a quick implementation of sequential MNIST, using [PyTorch Lightning](https://github.com/williamFalcon/pytorch-lightning).
 
 #### Visualization
 
