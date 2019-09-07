@@ -19,7 +19,10 @@ def main():
     model = LstmModel(input_dim, hidden_dim, output_dim)
     lightning_module = SeqMNIST(model, learning_rate, batch_size)
     exp = Experiment(save_dir='experiments')
-    trainer = Trainer(experiment=exp, gradient_clip=gradient_clip)
+    if torch.cuda.is_available():
+        trainer = Trainer(experiment=exp, gradient_clip=gradient_clip, gpus=[0])
+    else:
+        trainer = Trainer(experiment=exp, gradient_clip=gradient_clip)
     trainer.fit(lightning_module)
 
 
