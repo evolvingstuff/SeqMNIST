@@ -14,19 +14,23 @@ def main():
     hidden_dim = 128
     output_dim = 10
     learning_rate = 0.0005
-    batch_size = 2 #
+    batch_size = 32
     gradient_clip = 2.0
     is_permuted = False
+    max_epochs = 100
+    percent_validation = 0.2
 
     gpus = None
     if torch.cuda.is_available():
         gpus = [0]
 
     model = LstmModel(input_scan_dim, hidden_dim, output_dim)
-    lightning_module = SeqMNIST(model, learning_rate, batch_size, is_permuted)
+    lightning_module = SeqMNIST(model, learning_rate, batch_size, is_permuted, percent_validation)
     exp = Experiment(save_dir='experiments')
-    trainer = Trainer(experiment=exp, gradient_clip=gradient_clip, gpus=gpus)
+    trainer = Trainer(experiment=exp, track_grad_norm=-1, print_nan_grads=False,
+                      gradient_clip=gradient_clip, gpus=gpus, max_nb_epochs=max_epochs)
     trainer.fit(lightning_module)
+    # trainer.test() # TODO this appears not to work
 
 
 if __name__ == '__main__':
